@@ -46,15 +46,3 @@ server.on("listening", () => {
 });
 
 server.listen(port);
-
-const mongoose = require("mongoose");
-mongoose.set("strictQuery", false);
-mongoose
-  .connect(
-    "mongodb+srv://jimmydef:poulet04@cluster0.iaximrs.mongodb.net/?retryWrites=true&w=majority",
-    { useNewUrlParser: true, useUnifiedTopology: true }
-  )
-  .then(() => console.log("Connexion à MongoDB réussie !"))
-  .catch(() => console.log("Connexion à MongoDB échouée !"));
-
-const app = express();
