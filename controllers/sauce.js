@@ -84,38 +84,87 @@ exports.deleteSauce = (req, res) => {
 exports.likeDislikeSauce = (req, res) => {
   const SauceObject = { ...req.body };
 
-  delete SauceObject._userId;
-  Sauce.findOne({ _id: req.params.id })
-    .then((sauce) => {
-      if (sauce.userId != req.auth.userId) {
-        res.status(403).json({ message: " unauthorized request" });
-      } else {
-        if (SauceObject.like === 0) {
-          const usersLikedFiltered = SauceObject.usersLiked.filter(
-            (elt) => elt.userId != sauce.userId
-          );
-          const usersDislikedFiltered = SauceObject.usersDisliked.filter(
-            (elt) => elt.userId != sauce.userId
-          );
-          const likes = usersLikedFiltered.length;
-          const dislikes = usersDislikedFiltered.length;
-          Sauce.updateOne(
-            { _id: req.params.id },
-            {
-              ...SauceObject,
-              usersLiked: usersLikedFiltered,
-              usersDisliked: usersDislikedFiltered,
-              likes: likes,
-              dislikes: dislikes,
-              _id: req.params.id,
+  if (SauceObject.userId != req.auth.userId) {
+    res.status(403).json({ message: " unauthorized request" });
+  } else {
+    Sauce.findOne({ _id: req.params.id })
+      .then((sauce) => {
+        const usersLikedArray = sauce.usersLiked;
+
+        const userDislikedArray = sauce.usersDisliked;
+        const usersLikedFiltered = usersLikedArray.filter(
+          (elt) => elt !== SauceObject.userId
+        );
+
+        const usersDislikedFiltered = userDislikedArray.filter(
+          (elt) => elt !== SauceObject.userId
+        );
+
+        const foundUserLikes = usersLikedArray.includes(SauceObject.userId);
+        const foundUserDislikes = userDislikedArray.includes(
+          SauceObject.userId
+        );
+
+        switch (SauceObject.like) {
+          case 1:
+            if (!foundUserLikes) {
+              usersLikedArray.push(SauceObject.userId);
+
+              Sauce.updateOne(
+                { _id: req.params.id },
+                {
+                  _id: req.params.id,
+                  usersLiked: usersLikedArray,
+                  usersDisliked: usersDislikedFiltered,
+                  likes: usersLikedArray.length,
+                  dislikes: usersDislikedFiltered.length,
+                }
+              )
+                .then(() =>
+                  res.status(200).json({ message: "Apréciation mise à jour" })
+                )
+                .catch((error) => res.status(400).json({ error }));
             }
-          )
-            .then(() =>
-              res.status(200).json({ message: "Apréciation mise à jour" })
+            break;
+          case -1:
+            if (!foundUserDislikes) {
+              userDislikedArray.push(SauceObject.userId);
+
+              Sauce.updateOne(
+                { _id: req.params.id },
+                {
+                  _id: req.params.id,
+                  usersLiked: usersLikedFiltered,
+                  usersDisliked: userDislikedArray,
+                  likes: usersLikedFiltered.length,
+                  dislikes: userDislikedArray.length,
+                }
+              )
+                .then(() =>
+                  res.status(200).json({ message: "Apréciation mise à jour" })
+                )
+                .catch((error) => res.status(400).json({ error }));
+            }
+            break;
+          case 0:
+            Sauce.updateOne(
+              { _id: req.params.id },
+              {
+                _id: req.params.id,
+                usersLiked: usersLikedFiltered,
+                usersDisliked: usersDislikedFiltered,
+                likes: usersLikedFiltered.length,
+                dislikes: usersDislikedFiltered.length,
+              }
             )
-            .catch((error) => res.status(400).json({ error }));
+              .then(() =>
+                res.status(200).json({ message: "Apréciation mise à jour" })
+              )
+              .catch((error) => res.status(400).json({ error }));
         }
-      }
-    })
-    .catch((error) => res.status(404).json({ error }));
+      })
+      .catch((error) => {
+        res.status(404).json({ error });
+      });
+  }
 };
