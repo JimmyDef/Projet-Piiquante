@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json());
 
 app.use(morgan("dev"));
-mongoose.set("strictQuery", false);
+
 mongoose
   .connect(process.env.mongodb_URL, {
     useNewUrlParser: true,

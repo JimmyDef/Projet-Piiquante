@@ -1,6 +1,10 @@
 const Sauce = require("./../models/sauce");
 const fs = require("fs");
 
+//-----------------------------------------------------
+// LOGIQUE CREATESAUCE
+//-----------------------------------------------------
+
 exports.createSauce = (req, res) => {
   const sauceObject = {
     ...JSON.parse(req.body.sauce),
@@ -23,17 +27,30 @@ exports.createSauce = (req, res) => {
     .catch((error) => res.status(400).json({ error }));
 };
 
+//-----------------------------------------------------
+// LOGIQUE GETALLSAUCE
+//-----------------------------------------------------
+
 exports.getAllSauce = (req, res) => {
   Sauce.find()
     .then((sauces) => res.status(200).json(sauces))
     .catch((error) => res.status(400).json({ error }));
 };
 
+//-----------------------------------------------------
+// LOGIQUE GETONESAUCE
+//-----------------------------------------------------
+
 exports.getOneSauce = (req, res) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => res.status(200).json(sauce))
     .catch((error) => res.status(400).json({ error }));
 };
+
+//-----------------------------------------------------
+// LOGIQUE MODIFYSAUCE
+//-----------------------------------------------------
+
 exports.modifySauce = (req, res) => {
   const sauceObject = req.file
     ? {
@@ -64,6 +81,10 @@ exports.modifySauce = (req, res) => {
     .catch((error) => res.status(404).json({ error }));
 };
 
+//-----------------------------------------------------
+// LOGIQUE DELETESAUCE
+//-----------------------------------------------------
+
 exports.deleteSauce = (req, res) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
@@ -81,6 +102,11 @@ exports.deleteSauce = (req, res) => {
     })
     .catch((error) => res.status(404).json({ error }));
 };
+
+//-----------------------------------------------------
+// LOGIQUE LIKEDISLIKESAUCE
+//-----------------------------------------------------
+
 exports.likeDislikeSauce = (req, res) => {
   const SauceObject = { ...req.body };
 
@@ -90,12 +116,11 @@ exports.likeDislikeSauce = (req, res) => {
     Sauce.findOne({ _id: req.params.id })
       .then((sauce) => {
         const usersLikedArray = sauce.usersLiked;
-
         const userDislikedArray = sauce.usersDisliked;
+
         const usersLikedFiltered = usersLikedArray.filter(
           (elt) => elt !== SauceObject.userId
         );
-
         const usersDislikedFiltered = userDislikedArray.filter(
           (elt) => elt !== SauceObject.userId
         );
