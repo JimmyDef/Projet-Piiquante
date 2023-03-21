@@ -1,17 +1,22 @@
 const bcrypt = require("bcrypt");
-const User = require("./../models/user");
+const User = require("../models/user_model");
 const jwt = require("jsonwebtoken");
+const CryptoJS = require("crypto-js");
 
 //-----------------------------------------------------
 // LOGIQUE SIGNUP
 //-----------------------------------------------------
 
 exports.signup = (req, res) => {
+  const emailCryptoJs = CryptoJS.HmacSHA256(
+    JSON.stringify(req.body.email),
+    process.env.email_secret_key
+  ).toString();
   bcrypt
     .hash(req.body.password, 10)
     .then((hash) => {
       const user = new User({
-        email: req.body.email,
+        email: emailCryptoJs,
         password: hash,
       });
       user
@@ -27,7 +32,11 @@ exports.signup = (req, res) => {
 //-----------------------------------------------------
 
 exports.login = (req, res) => {
-  User.findOne({ email: req.body.email })
+  const emailCyptoJs = CryptoJS.HmacSHA256(
+    JSON.stringify(req.body.email),
+    process.env.email_secret_key
+  ).toString();
+  User.findOne({ email: emailCyptoJs })
     .then((user) => {
       if (user === null) {
         res

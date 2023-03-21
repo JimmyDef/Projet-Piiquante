@@ -1,19 +1,24 @@
 const express = require("express");
-
+const helmet = require("helmet");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
-const userRoutes = require("./routes/user");
-const sauceRoutes = require("./routes/sauce");
+const userRoutes = require("./routes/user_route");
+const sauceRoutes = require("./routes/sauce_route");
 const path = require("path");
-
 const dotenv = require("dotenv");
 dotenv.config();
 const app = express();
 app.use(express.json());
 
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
 app.use(morgan("dev"));
 
 mongoose
+  .set("strictQuery", false)
   .connect(process.env.mongodb_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
