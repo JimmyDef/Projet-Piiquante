@@ -21,20 +21,21 @@ const storage = multer.diskStorage({
     const name = file.originalname.split(" ").join("_");
     const extension = MIME_TYPES[file.mimetype];
     if (
-      file.mimetype === "image/jpeg" ||
-      file.mimetype === "image/png" ||
-      file.mimetype === "image/jpg" ||
-      file.mimetype === "image/bmp" ||
-      file.mimetype === "image/gif" ||
-      file.mimetype === "image/ico" ||
-      file.mimetype === "image/svg" ||
-      file.mimetype === "image/tiff" ||
-      file.mimetype === "image/tif" ||
-      file.mimetype === "image/webp"
+      req.body.sauce &&
+      (file.mimetype === "image/jpeg" ||
+        file.mimetype === "image/png" ||
+        file.mimetype === "image/jpg" ||
+        file.mimetype === "image/bmp" ||
+        file.mimetype === "image/gif" ||
+        file.mimetype === "image/ico" ||
+        file.mimetype === "image/svg" ||
+        file.mimetype === "image/tiff" ||
+        file.mimetype === "image/tif" ||
+        file.mimetype === "image/webp")
     ) {
       callback(null, name + Date.now() + "." + extension);
     } else {
-      console.log("🚀 ~ Fichier non pris en charge.");
+      callback(new Error("🚀 ~ Fichier non pris en charge."));
     }
   },
 });
