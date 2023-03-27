@@ -63,6 +63,7 @@ exports.modifySauce = (req, res) => {
   delete sauceObject._userId;
 
   Sauce.findOne({ _id: req.params.id })
+
     .then((sauce) => {
       if (sauce.userId != req.auth.userId) {
         res.status(403).json({ message: "unauthorized request" });

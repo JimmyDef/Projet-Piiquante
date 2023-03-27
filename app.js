@@ -26,6 +26,9 @@ mongoose
   .then(() => console.log("Connexion à MongoDB réussie ! "))
   .catch(() => console.log("Connexion à MongoDb échouée !"));
 
+//------------------------------------------
+// CORS
+
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -38,6 +41,8 @@ app.use((req, res, next) => {
   );
   next();
 });
+//------------------------------------------
+
 app.use("/api/auth", userRoutes);
 app.use("/api/sauces", sauceRoutes);
 app.use("/images", express.static(path.join(__dirname, "images")));
